@@ -1,0 +1,24 @@
+/* Background */
+.root {
+    -fx-background-image: url("/resources/background.jpg");
+    -fx-background-size: cover;
+}
+
+.label{
+	-fx-text-fill: #FFFFFF;
+}
+
+/* Menu Bar */
+.menu-bar{
+    -fx-background-color: rgba(255, 255, 255, 0.5);
+}
+.menu:hover {
+    -fx-background-color: #FFFFFF;
+}
+.menu .label{
+    -fx-text-fill: #000000;
+}
+
+#message{
+	-fx-text-fill: #00BCD4;
+}
