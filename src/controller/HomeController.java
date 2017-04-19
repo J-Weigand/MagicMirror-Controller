@@ -5,13 +5,17 @@ import java.net.UnknownHostException;
 import java.util.ArrayList;
 import java.util.List;
 
-import core.connectionManager;
+import core.configMirror;
+import core.mirrorGateway;
+import core.networkScanner;
 import javafx.application.Platform;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.scene.control.Button;
+import javafx.scene.control.CheckBox;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.Label;
+import javafx.scene.control.TextField;
 import javafx.scene.control.ToggleButton;
 import javafx.scene.image.ImageView;
 import main.Main;
@@ -28,11 +32,16 @@ public class HomeController {
 	private Label message;
 	@FXML
 	private ComboBox<String> selection;
+	@FXML
+	private CheckBox override;
+	@FXML
+	private TextField ipInput;
 
 	private static int COUNT = 0;
 	private List<String> availPCs = new ArrayList<String>();
-	public static connectionManager connManager = new connectionManager();
+	public static networkScanner connManager = new networkScanner();
 	public static CredentialController credControl = new CredentialController();
+	private configMirror CM = new configMirror();
 
 	public void initialize() {
 		timeOn.setSelected(true);
@@ -88,11 +97,40 @@ public class HomeController {
 	}
 
 	@FXML
+	private void handleOverride(ActionEvent event) {
+		CheckBox source = (CheckBox) event.getSource();
+		if (source == override) {
+			if (override.isSelected()) {
+				Main.logger.info("[Override] Selection - ON");
+				selection.setVisible(false);
+				connectBtn.setText("Connect");
+				ipInput.setVisible(true);
+				COUNT++;
+			} else {
+				Main.logger.info("[Override] Selection - OFF");
+				selection.setVisible(true);
+				connectBtn.setText("Scan");
+				ipInput.setVisible(false);
+				COUNT--;
+			}
+		}
+	}
+
+	@FXML
 	private void handleButton(ActionEvent event) throws UnknownHostException, IOException {
 		Button source = (Button) event.getSource();
 		if (source == applyBtn) {
 			Main.logger.info("Apply Button - Clicked");
-			message.setText("Display Updated");
+			if (!CM.createConfig(timeOn.isSelected(), newsOn.isSelected(), weatherOn.isSelected())) {
+				message.setText("An error occured while creating new config file");
+			} else {
+				if (mirrorGateway.uploadConfig()) {
+					message.setText("Display Updated Successfully");
+				} else {
+					credControl.infoMessage("Update Unsuccessful",
+							"An error occured while updating MagicMirror preferences. Please try again.");
+				}
+			}
 		}
 		if (source == cancelBtn) {
 			Main.logger.info("Cancel Button - Clicked");
@@ -105,7 +143,7 @@ public class HomeController {
 				message.setText("Scanning Network... Please Wait");
 				Runnable expensiveTask = (() -> {
 					try {
-						availPCs = connManager.scanNetwork("192.168.0");
+						availPCs = connManager.scanNetwork();
 					} catch (IOException e) {
 						Main.logger.error("Network Scan failed to execute");
 						e.printStackTrace();
@@ -125,25 +163,34 @@ public class HomeController {
 				// List<String> TEMPORARY = new ArrayList<String>();
 				// TEMPORARY.add("192.168.0.1");
 				// selection.getItems().addAll(TEMPORARY);
-				
+
 				connectBtn.setDisable(true);
 				connectBtn.setText("Connect");
 				COUNT++;
-			} else if (COUNT == 1) {
+			} else if (source == connectBtn && override.isSelected() || COUNT == 1) {
 				if (selection.getValue() != null) {
+					mirrorGateway.setFtpHost(selection.getValue());
 					message.setText("Attempting to connect to: " + selection.getValue());
-					selection.setDisable(true);
-					connectBtn.setDisable(true);
+					// selection.setDisable(true);
+					// connectBtn.setDisable(true);
 					credControl.login();
-					credControl.infoMessage("Login Successful", "Magic Mirror connection achieved");
-					connectBtn.setText("Disconnect");
-					message.setText("Connected to: " + selection.getValue());
-					connectBtn.setDisable(false);
-					COUNT++;
+					if (mirrorGateway.testConnection()) {
+						credControl.infoMessage("Login Successful", "Magic Mirror connection achieved");
+						connectBtn.setText("Disconnect");
+						message.setText("Connected to: " + selection.getValue());
+						connectBtn.setDisable(false);
+						override.setDisable(true);
+						COUNT++;
+					} else {
+						credControl.infoMessage("Connection Refused",
+								"The username and password used is incorrect. Please try again.");
+						credControl.login();
+					}
 				}
 			} else if (COUNT == 2) {
 				message.setText("Diconnected from: " + selection.getValue());
 				initialize();
+				connectBtn.setText("Scan");
 				COUNT = 0;
 			}
 		}

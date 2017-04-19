@@ -22,3 +22,7 @@
 #message{
 	-fx-text-fill: #00BCD4;
 }
+
+#override{
+	-fx-text-fill: #FFFFFF;
+}

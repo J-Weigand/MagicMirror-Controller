@@ -2,22 +2,24 @@ package controller;
 
 import java.util.Optional;
 
+import core.mirrorGateway;
 import javafx.application.Platform;
 import javafx.geometry.Insets;
 import javafx.scene.Node;
-import javafx.scene.control.ButtonBar.ButtonData;
 import javafx.scene.control.Alert;
+import javafx.scene.control.Alert.AlertType;
+import javafx.scene.control.ButtonBar.ButtonData;
 import javafx.scene.control.ButtonType;
 import javafx.scene.control.Dialog;
 import javafx.scene.control.Label;
 import javafx.scene.control.PasswordField;
 import javafx.scene.control.TextField;
-import javafx.scene.control.Alert.AlertType;
 import javafx.scene.layout.GridPane;
 import javafx.stage.Modality;
 import javafx.util.Pair;
 
 public class CredentialController {
+	public static mirrorGateway mG = new mirrorGateway();
 
 	public void login() {
 		// Create the custom dialog.
@@ -76,7 +78,11 @@ public class CredentialController {
 		Optional<Pair<String, String>> result = dialog.showAndWait();
 
 		result.ifPresent(usernamePassword -> {
-			System.out.println("Username=" + usernamePassword.getKey() + ", Password=" + usernamePassword.getValue());
+			// System.out.println("Username=" + usernamePassword.getKey() + ",
+			// Password=" + usernamePassword.getValue());
+			mirrorGateway.setFtpUser(usernamePassword.getKey());
+			mirrorGateway.setFtpPswd(usernamePassword.getValue());
+//			System.out.println("Username=" + mirrorGateway.getFtpUser() + "Password=" + mirrorGateway.getFtpPswd());
 		});
 	}
 
@@ -96,7 +102,7 @@ public class CredentialController {
 		Optional<ButtonType> result = alert.showAndWait();
 		return result.get().getText();
 	}
-	
+
 	public String infoMessage(String title, String msg) {
 		// Create and Build Alert Type
 		ButtonType OK = new ButtonType("Ok", ButtonData.CANCEL_CLOSE);

@@ -8,14 +8,13 @@ import java.util.List;
 
 import main.Main;
 
-public class connectionManager {
+public class networkScanner {
 	private List<String> addresses = new ArrayList<String>();
 
-	public List<String> scanNetwork(String subnet) throws UnknownHostException, IOException {
+	public List<String> scanNetwork() throws UnknownHostException, IOException {
 		InetAddress localhost = InetAddress.getLocalHost();
 		byte[] ip = localhost.getAddress();
-
-		for (int i = 1; i <= 100; i++) {
+		for (int i = 1; i <= 256; i++) {
 			try {
 				ip[3] = (byte) i;
 				InetAddress address = InetAddress.getByAddress(ip);
@@ -25,7 +24,7 @@ public class connectionManager {
 					Main.logger.info(output + " is on the network");
 				}
 			} catch (Exception e) {
-				addresses = null;
+//				addresses = null;
 				e.printStackTrace();
 			}
 		}
