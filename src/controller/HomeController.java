@@ -4,6 +4,8 @@ import java.io.IOException;
 import java.net.UnknownHostException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import core.configMirror;
 import core.mirrorGateway;
@@ -40,10 +42,13 @@ public class HomeController {
 	private TextField ipInput;
 
 	private Integer mDelay = 3;
+	private configMirror CM = new configMirror();
 	private List<String> availPCs = new ArrayList<String>();
 	public static networkScanner connManager = new networkScanner();
 	public static CredentialController credControl = new CredentialController();
-	private configMirror CM = new configMirror();
+	private static final String IPADDRESS_PATTERN = "^([01]?\\d\\d?|2[0-4]\\d|25[0-5])\\."
+			+ "([01]?\\d\\d?|2[0-4]\\d|25[0-5])\\." + "([01]?\\d\\d?|2[0-4]\\d|25[0-5])\\."
+			+ "([01]?\\d\\d?|2[0-4]\\d|25[0-5])$";
 
 	/**
 	 * Method initiliazes first run instance
@@ -165,11 +170,13 @@ public class HomeController {
 				scanBtn.setDisable(true);
 				comboSelection.setVisible(false);
 				ipInput.setVisible(true);
+				ipInput.clear();
 			} else {
 				Main.logger.info("[Override] Selection - OFF");
 				scanBtn.setDisable(false);
 				comboSelection.setVisible(true);
 				ipInput.setVisible(false);
+				ipInput.clear();
 			}
 		} else if (source == overrideTime) {
 			if (overrideTime.isSelected()) {
@@ -195,8 +202,7 @@ public class HomeController {
 		if (source == applyBtn) {
 			Main.logger.info("Apply Button - Clicked");
 			if (conBtn.getText().equals("Connect")) {
-				credControl.infoMessage("Connect to SmartMirror",
-						"Please select and connect to a valid SmartMirror for changes to take effect");
+				credControl.alertMessage("Connect", "Please connect to your SmartMirror to continue");
 			} else {
 				save();
 			}
@@ -215,7 +221,17 @@ public class HomeController {
 			override.setDisable(false);
 		} else if (source == conBtn) {
 			Main.logger.info("Connect Button - Clicked");
-			piLogin();
+			if (override.isSelected() && ipInput.getText().isEmpty()) {
+				Main.logger.info("Invalid 1");
+				credControl.alertMessage("Connect", "Please connect to your SmartMirror to continue");
+				return;
+			} else if (!override.isSelected() && comboSelection.getValue() == null) {
+				Main.logger.info("Invalid 2");
+				credControl.alertMessage("Connect", "Please connect to your SmartMirror to continue");
+				return;
+			} else {
+				piLogin();
+			}
 		}
 	}
 
@@ -255,12 +271,20 @@ public class HomeController {
 	 * Method attempts and ensures proper login to RaspPi
 	 */
 	private void piLogin() {
-		if (override.isSelected() && conBtn.getText().equals("Connect")) {
+		Main.logger.info("Entered Pi Login");
+
+		if (override.isSelected()) {
+			Main.logger.info("Entered Pi Login - 1");
 			if (ipInput.getText() != null) {
-				message.setText("Attempting to connect to: " + ipInput.getText());
+				if (!validateIP(ipInput.getText())) {
+					Main.logger.info("Validating IP Address");
+					credControl.alertMessage("Connect", "Enter a valid IP address.");
+					return;
+				}
+				messageSystem("Attempting to connect to: " + ipInput.getText(), mDelay);
 				credControl.login();
 				if (mirrorGateway.testConnection(ipInput.getText().toString())) {
-					credControl.infoMessage("Login Successful", "Magic Mirror connection achieved");
+					credControl.infoMessage("Login Successful", "SmartMirror connection achieved");
 					conBtn.setText("Disconnect");
 					ipInput.setDisable(true);
 					message.setText("Connected to: " + ipInput.getText());
@@ -268,28 +292,29 @@ public class HomeController {
 					scanBtn.setDisable(true);
 					override.setDisable(true);
 				} else {
-					credControl.infoMessage("Login Unsuccessful",
+					credControl.alertMessage("Login Unsuccessful",
 							"Username and passwword are incorrect. Please try again.");
 				}
 			} else {
-				credControl.infoMessage("Connect", "Enter a valid IP address.");
+				credControl.alertMessage("Connect", "Enter a valid IP address.");
 			}
 		}
 
-		if (!override.isSelected() && conBtn.getText().equals("Connect")) {
+		if (!override.isSelected()) {
+			Main.logger.info("Entered Pi Login - 2");
 			if (comboSelection.getValue() != null) {
 				mirrorGateway.setFtpHost(comboSelection.getValue());
-				message.setText("Attempting to connect to: " + comboSelection.getValue());
+				messageSystem("Attempting to connect to: " + comboSelection.getValue(), mDelay);
 				credControl.login();
 				if (mirrorGateway.testConnection(null)) {
-					credControl.infoMessage("Login Successful", "Magic Mirror connection achieved");
+					credControl.infoMessage("Login Successful", "SmartMirror connection achieved");
 					conBtn.setText("Disconnect");
 					message.setText("Connected to: " + comboSelection.getValue());
 					comboSelection.setDisable(true);
 					scanBtn.setDisable(true);
 					override.setDisable(true);
 				} else {
-					credControl.infoMessage("Connection Refused",
+					credControl.alertMessage("Connection Refused",
 							"The username and password used is incorrect. Please try again.");
 					credControl.login();
 				}
@@ -308,9 +333,23 @@ public class HomeController {
 			if (mirrorGateway.uploadConfig()) {
 				messageSystem("Display Updated Successfully", mDelay);
 			} else {
-				credControl.infoMessage("Update Unsuccessful",
+				credControl.alertMessage("Update Unsuccessful",
 						"An error occured while updating MagicMirror preferences. Please try again.");
 			}
 		}
+	}
+
+	/**
+	 * Method checks for a valid IP address
+	 * 
+	 * @param ip
+	 * @return
+	 */
+	public boolean validateIP(final String ip) {
+		Pattern pattern;
+		Matcher matcher;
+		pattern = Pattern.compile(IPADDRESS_PATTERN);
+		matcher = pattern.matcher(ip);
+		return matcher.matches();
 	}
 }

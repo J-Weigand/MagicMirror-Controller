@@ -20,17 +20,20 @@ public class mirrorGateway {
 	static String ftpDir = "/home/pi/Desktop/";
 
 	public static boolean testConnection(String HOST) {
-		try {
-			if (HOST != null)
-				ftpHost = HOST;
-			client.connect(ftpHost);
-			client.login(ftpUser, ftpPswd);
-			client.disconnect(false);
-		} catch (IllegalStateException | IOException | FTPIllegalReplyException | FTPException e) {
-			e.printStackTrace();
-			return false;
+		if (ftpUser != null && !ftpUser.isEmpty() && ftpPswd != null && !ftpPswd.isEmpty()) {
+			try {
+				if (HOST != null)
+					ftpHost = HOST;
+				client.connect(ftpHost);
+				client.login(ftpUser, ftpPswd);
+				client.disconnect(false);
+			} catch (IllegalStateException | IOException | FTPIllegalReplyException | FTPException e) {
+				e.printStackTrace();
+				return false;
+			}
+			return true;
 		}
-		return true;
+		return false;
 	}
 
 	public static boolean uploadConfig() {

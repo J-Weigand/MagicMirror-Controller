@@ -15,10 +15,10 @@ import javafx.scene.control.Dialog;
 import javafx.scene.control.Label;
 import javafx.scene.control.PasswordField;
 import javafx.scene.control.TextField;
-import javafx.scene.input.KeyEvent;
 import javafx.scene.layout.GridPane;
 import javafx.stage.Modality;
 import javafx.util.Pair;
+import main.Main;
 
 public class CredentialController {
 	public static mirrorGateway mG = new mirrorGateway();
@@ -26,8 +26,8 @@ public class CredentialController {
 	public void login() {
 		// Create the custom dialog.
 		Dialog<Pair<String, String>> dialog = new Dialog<>();
-		dialog.setTitle("Magic Mirror");
-		dialog.setHeaderText("Login to the selected Magic Mirror");
+		dialog.setTitle("SmartMirror");
+		dialog.setHeaderText("Login to the selected SmartMirror");
 
 		// Set the button types.
 		ButtonType loginButtonType = new ButtonType("Login", ButtonData.OK_DONE);
@@ -78,15 +78,15 @@ public class CredentialController {
 		result.ifPresent(usernamePassword -> {
 			mirrorGateway.setFtpUser(usernamePassword.getKey());
 			mirrorGateway.setFtpPswd(usernamePassword.getValue());
+			Main.logger.info("USER: " + mirrorGateway.getFtpUser() + " PASS: " + mirrorGateway.getFtpPswd());
 		});
 	}
 
 	public String alertMessage(String title, String msg) {
-		// Configure Button Text
-		ButtonType OK = new ButtonType("Ok", ButtonData.YES);
 		// Create and Build Alert Type
 		Alert alert = new Alert(AlertType.WARNING);
-		alert.getButtonTypes().setAll(OK);
+		Button OK = (Button) alert.getDialogPane().lookupButton(ButtonType.OK);
+		OK.setDefaultButton(true);
 		alert.setTitle("");
 		alert.initModality(Modality.APPLICATION_MODAL);
 		alert.setHeaderText(title);
@@ -100,7 +100,7 @@ public class CredentialController {
 
 	public String infoMessage(String title, String msg) {
 		// Create and Build Alert Type
-		Alert alert = new Alert(AlertType.CONFIRMATION);
+		Alert alert = new Alert(AlertType.INFORMATION);
 		Button OK = (Button) alert.getDialogPane().lookupButton(ButtonType.OK);
 		OK.setDefaultButton(true);
 		alert.setTitle("");
