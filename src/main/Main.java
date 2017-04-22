@@ -17,6 +17,11 @@ import javafx.stage.Stage;
 public class Main extends Application {
 	public static Logger logger = LogManager.getLogger();
 
+	/**
+	 * Main Method
+	 * 
+	 * @param args
+	 */
 	public static void main(String[] args) {
 		launch(args);
 	}
@@ -44,6 +49,7 @@ public class Main extends Application {
 			Main.logger.info("MenuController Loaded");
 		} catch (IOException e1) {
 			Main.logger.fatal("MenuController Failed to Load");
+			e1.printStackTrace();
 		}
 		// Plug view into a scene
 		Scene scene = new Scene(view);

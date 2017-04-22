@@ -2,6 +2,9 @@ package core;
 
 import java.io.File;
 import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 
 import it.sauronsoftware.ftp4j.FTPAbortedException;
 import it.sauronsoftware.ftp4j.FTPClient;
@@ -16,8 +19,10 @@ public class mirrorGateway {
 	static String ftpHost = null;
 	static String ftpDir = "/home/pi/Desktop/";
 
-	public static boolean testConnection() {
+	public static boolean testConnection(String HOST) {
 		try {
+			if (HOST != null)
+				ftpHost = HOST;
 			client.connect(ftpHost);
 			client.login(ftpUser, ftpPswd);
 			client.disconnect(false);
@@ -32,6 +37,7 @@ public class mirrorGateway {
 		try {
 			client.connect(ftpHost);
 			client.login(ftpUser, ftpPswd);
+			ftpDir = "/home/" + ftpUser + "/MagicMirror/";
 			client.changeDirectory(ftpDir);
 			client.setType(FTPClient.TYPE_BINARY);
 			System.out.println("Uploading File...");
@@ -39,6 +45,9 @@ public class mirrorGateway {
 			client.upload(new File(configFile));
 			System.out.println("Upload Successful!");
 			client.disconnect(false);
+			Path pathToFile = Paths.get(System.getProperty("user.dir"), configFile);
+			Files.delete(pathToFile);
+			System.out.println("Deleted File @: " + pathToFile);
 		} catch (IllegalStateException | IOException | FTPIllegalReplyException | FTPException
 				| FTPDataTransferException | FTPAbortedException e2) {
 			e2.printStackTrace();

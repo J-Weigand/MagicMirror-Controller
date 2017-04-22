@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
+<?import javafx.scene.effect.*?>
 <?import javafx.scene.text.*?>
 <?import javafx.scene.image.*?>
 <?import javafx.scene.control.*?>
@@ -17,43 +18,37 @@
 			<image>
 				<Image url="@../resources/Mirror.jpg" />
 			</image>
+			<effect>
+				<DropShadow color="WHITE" spread="0.5" />
+			</effect>
 		</ImageView>
 		<Label layoutX="26.0" layoutY="171.0" text="Time"
-			AnchorPane.leftAnchor="25.0" AnchorPane.topAnchor="171.0">
+			AnchorPane.leftAnchor="25.0" AnchorPane.topAnchor="150.0">
 			<font>
 				<Font name="Arial Bold" size="24.0" />
 			</font>
 		</Label>
-		<ToggleButton fx:id="timeOn" layoutX="406.0" layoutY="171.0"
+		<ToggleButton fx:id="time" layoutX="456.0" layoutY="150.0"
 			mnemonicParsing="false" onAction="#handleToggle" prefWidth="40.0"
-			selected="true" text="On" AnchorPane.topAnchor="171.0" />
-		<ToggleButton fx:id="timeOff" layoutX="450.0" layoutY="171.0"
-			mnemonicParsing="false" onAction="#handleToggle" prefWidth="40.0"
-			text="Off" AnchorPane.topAnchor="171.0" />
+			selected="true" text="On" AnchorPane.topAnchor="150.0" />
 		<Label layoutX="26.0" layoutY="271.0" text="News"
-			AnchorPane.leftAnchor="25.0" AnchorPane.topAnchor="271.0">
+			AnchorPane.leftAnchor="25.0" AnchorPane.topAnchor="250.0">
 			<font>
 				<Font name="Arial Bold" size="24.0" />
 			</font>
 		</Label>
-		<ToggleButton fx:id="newsOn" layoutX="408.0" layoutY="271.0"
+		<ToggleButton fx:id="news" layoutX="456.0" layoutY="271.0"
 			mnemonicParsing="false" onAction="#handleToggle" prefWidth="40.0"
-			selected="true" text="On" AnchorPane.topAnchor="271.0" />
-		<ToggleButton fx:id="newsOff" layoutX="452.0" layoutY="271.0"
-			mnemonicParsing="false" onAction="#handleToggle" prefWidth="40.0"
-			text="Off" AnchorPane.topAnchor="271.0" />
+			selected="true" text="On" AnchorPane.topAnchor="250.0" />
 		<Label layoutX="26.0" layoutY="371.0" text="Weather"
-			AnchorPane.leftAnchor="25.0" AnchorPane.topAnchor="371.0">
+			AnchorPane.leftAnchor="25.0" AnchorPane.topAnchor="350.0">
 			<font>
 				<Font name="Arial Bold" size="24.0" />
 			</font>
 		</Label>
-		<ToggleButton fx:id="weatherOn" layoutX="408.0" layoutY="371.0"
+		<ToggleButton fx:id="weather" layoutX="456.0" layoutY="371.0"
 			mnemonicParsing="false" onAction="#handleToggle" prefWidth="40.0"
-			selected="true" text="On" AnchorPane.topAnchor="371.0" />
-		<ToggleButton fx:id="weatherOff" layoutX="452.0" layoutY="371.0"
-			mnemonicParsing="false" onAction="#handleToggle" prefWidth="40.0"
-			text="Off" AnchorPane.topAnchor="371.0" />
+			selected="true" text="On" AnchorPane.topAnchor="350.0" />
 		<ImageView fx:id="Weather" fitHeight="86.0" fitWidth="86.0"
 			layoutX="828.0" layoutY="92.0" pickOnBounds="true" preserveRatio="true">
 			<image>
@@ -72,35 +67,59 @@
 				<Image url="@../resources/News.png" />
 			</image>
 		</ImageView>
-		<Button fx:id="cancelBtn" layoutX="347.0" layoutY="532.0"
+		<Button fx:id="resetBtn" layoutX="351.0" layoutY="532.0"
 			mnemonicParsing="false" onAction="#handleButton" prefWidth="70.0"
-			text="Cancel" />
-		<Button fx:id="applyBtn" layoutX="421.0" layoutY="532.0"
+			text="Reset" />
+		<Button fx:id="applyBtn" layoutX="425.0" layoutY="532.0"
 			mnemonicParsing="false" onAction="#handleButton" prefWidth="70.0"
 			text="Apply" />
-		<ComboBox fx:id="selection" disable="true" layoutX="109.0"
-			layoutY="39.0" prefHeight="27.0" prefWidth="275.0" />
+		<ComboBox fx:id="comboSelection" disable="true" layoutX="109.0"
+			layoutY="39.0" prefHeight="27.0" prefWidth="294.0" />
 		<Label layoutX="26.0" layoutY="42.0" text="Connect"
 			AnchorPane.leftAnchor="30.0">
 			<font>
 				<Font name="Arial Bold" size="16.0" />
 			</font>
 		</Label>
-		<Button fx:id="connectBtn" layoutX="403.0" layoutY="39.0"
+		<Button fx:id="scanBtn" layoutX="413.0" layoutY="39.0"
 			mnemonicParsing="false" onAction="#handleButton" prefHeight="27.0"
-			prefWidth="91.0" text="Scan" />
+			prefWidth="87.0" text="Scan" />
 		<Label fx:id="message" layoutX="23.0" layoutY="537.0"
-			prefHeight="17.0" prefWidth="311.0" />
-		<CheckBox fx:id="override" layoutX="403.0" layoutY="77.0"
+			prefHeight="17.0" prefWidth="311.0">
+			<font>
+				<Font name="Arial Bold" size="14.0" />
+			</font>
+			<effect>
+				<Reflection />
+			</effect>
+		</Label>
+		<CheckBox fx:id="override" layoutX="109.0" layoutY="77.0"
 			mnemonicParsing="false" onAction="#handleOverride" text="Manual" />
 		<TextField fx:id="ipInput" layoutX="109.0" layoutY="39.0"
-			prefHeight="27.0" prefWidth="275.0" promptText="Enter a Valid IP Address (192.168.1.1)"
+			prefHeight="27.0" prefWidth="295.0" promptText="Enter a Valid IP Address (192.168.1.1)"
 			visible="false" />
 		<Separator layoutX="25.0" layoutY="203.0" prefHeight="7.0"
-			prefWidth="470.0" AnchorPane.leftAnchor="25.0" />
+			prefWidth="470.0" AnchorPane.leftAnchor="25.0" AnchorPane.topAnchor="180.0" />
 		<Separator layoutX="25.0" layoutY="305.0" prefHeight="7.0"
-			prefWidth="470.0" AnchorPane.leftAnchor="25.0" />
+			prefWidth="470.0" AnchorPane.leftAnchor="25.0" AnchorPane.topAnchor="280.0" />
 		<Separator layoutX="25.0" layoutY="405.0" prefHeight="7.0"
-			prefWidth="470.0" />
+			prefWidth="470.0" AnchorPane.leftAnchor="25.0" AnchorPane.topAnchor="380.0" />
+		<Button fx:id="conBtn" layoutX="413.0" layoutY="73.0"
+			mnemonicParsing="false" onAction="#handleButton" prefHeight="27.0"
+			prefWidth="87.0" text="Connect" />
+		<Separator layoutX="25.0" layoutY="506.0" prefHeight="7.0"
+			prefWidth="470.0" AnchorPane.leftAnchor="25.0" AnchorPane.topAnchor="480.0" />
+		<ToggleButton fx:id="calendar" layoutX="456.0" layoutY="450.0"
+			mnemonicParsing="false" onAction="#handleToggle" prefWidth="40.0"
+			selected="true" text="On" AnchorPane.topAnchor="450.0" />
+		<Label layoutX="26.0" layoutY="450.0" text="Calendar"
+			AnchorPane.topAnchor="450.0">
+			<font>
+				<Font name="Arial Bold" size="24.0" />
+			</font>
+		</Label>
+		<CheckBox fx:id="overrideTime" layoutX="357.0" layoutY="155.0"
+			mnemonicParsing="false" nodeOrientation="RIGHT_TO_LEFT" onAction="#handleOverride"
+			text="24 Hour" wrapText="true" />
 	</children>
 </AnchorPane>

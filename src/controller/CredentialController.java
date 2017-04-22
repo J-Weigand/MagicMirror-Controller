@@ -8,12 +8,14 @@ import javafx.geometry.Insets;
 import javafx.scene.Node;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Alert.AlertType;
+import javafx.scene.control.Button;
 import javafx.scene.control.ButtonBar.ButtonData;
 import javafx.scene.control.ButtonType;
 import javafx.scene.control.Dialog;
 import javafx.scene.control.Label;
 import javafx.scene.control.PasswordField;
 import javafx.scene.control.TextField;
+import javafx.scene.input.KeyEvent;
 import javafx.scene.layout.GridPane;
 import javafx.stage.Modality;
 import javafx.util.Pair;
@@ -26,10 +28,6 @@ public class CredentialController {
 		Dialog<Pair<String, String>> dialog = new Dialog<>();
 		dialog.setTitle("Magic Mirror");
 		dialog.setHeaderText("Login to the selected Magic Mirror");
-
-		// Set the icon (must be included in the project).
-		// dialog.setGraphic(new
-		// ImageView(this.getClass().getResource("login.png").toString()));
 
 		// Set the button types.
 		ButtonType loginButtonType = new ButtonType("Login", ButtonData.OK_DONE);
@@ -78,11 +76,8 @@ public class CredentialController {
 		Optional<Pair<String, String>> result = dialog.showAndWait();
 
 		result.ifPresent(usernamePassword -> {
-			// System.out.println("Username=" + usernamePassword.getKey() + ",
-			// Password=" + usernamePassword.getValue());
 			mirrorGateway.setFtpUser(usernamePassword.getKey());
 			mirrorGateway.setFtpPswd(usernamePassword.getValue());
-//			System.out.println("Username=" + mirrorGateway.getFtpUser() + "Password=" + mirrorGateway.getFtpPswd());
 		});
 	}
 
@@ -105,9 +100,9 @@ public class CredentialController {
 
 	public String infoMessage(String title, String msg) {
 		// Create and Build Alert Type
-		ButtonType OK = new ButtonType("Ok", ButtonData.CANCEL_CLOSE);
 		Alert alert = new Alert(AlertType.CONFIRMATION);
-		alert.getButtonTypes().setAll(OK);
+		Button OK = (Button) alert.getDialogPane().lookupButton(ButtonType.OK);
+		OK.setDefaultButton(true);
 		alert.setTitle("");
 		alert.initModality(Modality.APPLICATION_MODAL);
 		alert.setHeaderText(title);

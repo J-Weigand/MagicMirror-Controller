@@ -24,8 +24,8 @@ public class networkScanner {
 					Main.logger.info(output + " is on the network");
 				}
 			} catch (Exception e) {
-//				addresses = null;
-				e.printStackTrace();
+				Main.logger.info("WARNING: Network ping denied for some connections");
+//				e.printStackTrace();
 			}
 		}
 		return addresses;

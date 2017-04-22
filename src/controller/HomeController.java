@@ -8,6 +8,7 @@ import java.util.List;
 import core.configMirror;
 import core.mirrorGateway;
 import core.networkScanner;
+import javafx.animation.PauseTransition;
 import javafx.application.Platform;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
@@ -18,180 +19,297 @@ import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
 import javafx.scene.control.ToggleButton;
 import javafx.scene.image.ImageView;
+import javafx.util.Duration;
 import main.Main;
 
 public class HomeController {
 
 	@FXML
-	private ToggleButton timeOn, timeOff, newsOn, newsOff, weatherOn, weatherOff;
+	private ToggleButton time, news, weather, calendar;
 	@FXML
 	private ImageView Time, Weather, News;
 	@FXML
-	private Button applyBtn, cancelBtn, connectBtn;
+	private Button applyBtn, resetBtn, conBtn, scanBtn;
 	@FXML
 	private Label message;
 	@FXML
-	private ComboBox<String> selection;
+	private ComboBox<String> comboSelection;
 	@FXML
-	private CheckBox override;
+	private CheckBox override, overrideTime;
 	@FXML
 	private TextField ipInput;
 
-	private static int COUNT = 0;
+	private Integer mDelay = 3;
 	private List<String> availPCs = new ArrayList<String>();
 	public static networkScanner connManager = new networkScanner();
 	public static CredentialController credControl = new CredentialController();
 	private configMirror CM = new configMirror();
 
+	/**
+	 * Method initiliazes first run instance
+	 */
 	public void initialize() {
-		timeOn.setSelected(true);
-		newsOn.setSelected(true);
-		weatherOn.setSelected(true);
-		timeOff.setSelected(false);
-		newsOff.setSelected(false);
-		weatherOff.setSelected(false);
+		time.setSelected(true);
+		news.setSelected(true);
+		weather.setSelected(true);
+		calendar.setSelected(true);
 		Time.setVisible(true);
 		Weather.setVisible(true);
 		News.setVisible(true);
+		time.setText("On");
+		news.setText("On");
+		weather.setText("On");
+		calendar.setText("On");
 	}
 
+	/**
+	 * Method activates and deactivates certain on-screen elements
+	 * 
+	 * @param event
+	 */
 	@FXML
 	private void handleToggle(ActionEvent event) {
-		ToggleButton source = (ToggleButton) event.getSource();
+		Object source = (Object) event.getSource();
 		// Time
-		if (source == timeOn) {
-			Main.logger.info("[Time] Switch - ON");
-			timeOn.setSelected(true);
-			timeOff.setSelected(false);
-			Time.setVisible(true);
-		} else if (source == timeOff) {
-			Main.logger.info("[Time] Switch - OFF");
-			timeOn.setSelected(false);
-			timeOff.setSelected(true);
-			Time.setVisible(false);
+		if (source == time) {
+			if (!time.isSelected()) {
+				Main.logger.info("[Time] Switch - OFF");
+				messageSystem("Time - OFF", mDelay);
+				overrideTime.setDisable(true);
+				time.setText("Off");
+				time.setSelected(false);
+				Time.setVisible(false);
+			} else {
+				Main.logger.info("[Time] Switch - ON");
+				messageSystem("Time - ON", mDelay);
+				overrideTime.setDisable(false);
+				time.setText("On");
+				time.setSelected(true);
+				Time.setVisible(true);
+			}
 		}
 		// News
-		if (source == newsOn) {
-			Main.logger.info("[News] Switch - ON");
-			newsOn.setSelected(true);
-			newsOff.setSelected(false);
-			News.setVisible(true);
-		} else if (source == newsOff) {
-			Main.logger.info("[News] Switch - OFF");
-			newsOn.setSelected(false);
-			newsOff.setSelected(true);
-			News.setVisible(false);
+		if (source == news) {
+			if (!news.isSelected()) {
+				Main.logger.info("[News] Switch - OFF");
+				messageSystem("News - OFF", mDelay);
+				news.setText("Off");
+				news.setSelected(false);
+				News.setVisible(false);
+			} else {
+				Main.logger.info("[News] Switch - ON");
+				messageSystem("News - ON", mDelay);
+				news.setText("On");
+				news.setSelected(true);
+				News.setVisible(true);
+			}
 		}
 		// Weather
-		if (source == weatherOn) {
-			Main.logger.info("[Weather] Switch - ON");
-			weatherOn.setSelected(true);
-			weatherOff.setSelected(false);
-			Weather.setVisible(true);
-		} else if (source == weatherOff) {
-			Main.logger.info("[Weather] Switch - OFF");
-			weatherOn.setSelected(false);
-			weatherOff.setSelected(true);
-			Weather.setVisible(false);
+		if (source == weather) {
+			if (!weather.isSelected()) {
+				Main.logger.info("[Weather] Switch - OFF");
+				messageSystem("Weather - OFF", mDelay);
+				weather.setText("Off");
+				weather.setSelected(false);
+				Weather.setVisible(false);
+			} else {
+				Main.logger.info("[Weather] Switch - ON");
+				messageSystem("Weather - ON", mDelay);
+				weather.setText("On");
+				weather.setSelected(true);
+				Weather.setVisible(true);
+			}
+		}
+		// Calendar
+		if (source == calendar) {
+			if (!calendar.isSelected()) {
+				Main.logger.info("[Calendar] Switch - OFF");
+				messageSystem("Calendar - OFF", mDelay);
+				calendar.setText("Off");
+				calendar.setSelected(false);
+				// Calendar.setVisible(false);
+			} else {
+				Main.logger.info("[Calendar] Switch - ON");
+				messageSystem("Calendar - ON", mDelay);
+				calendar.setText("On");
+				calendar.setSelected(true);
+				// Calendar.setVisible(true);
+			}
 		}
 	}
 
+	/**
+	 * Method shows a timed message to alert user of any changes
+	 * 
+	 * @param msg
+	 * @param dur
+	 */
+	private void messageSystem(String msg, int dur) {
+		message.setText(msg);
+		PauseTransition pause = new PauseTransition(Duration.seconds(dur));
+		pause.setOnFinished(event -> message.setText(""));
+		pause.play();
+	}
+
+	/**
+	 * Method handles all check box (override) events
+	 * 
+	 * @param event
+	 */
 	@FXML
 	private void handleOverride(ActionEvent event) {
 		CheckBox source = (CheckBox) event.getSource();
 		if (source == override) {
 			if (override.isSelected()) {
 				Main.logger.info("[Override] Selection - ON");
-				selection.setVisible(false);
-				connectBtn.setText("Connect");
+				scanBtn.setDisable(true);
+				comboSelection.setVisible(false);
 				ipInput.setVisible(true);
-				COUNT++;
 			} else {
 				Main.logger.info("[Override] Selection - OFF");
-				selection.setVisible(true);
-				connectBtn.setText("Scan");
+				scanBtn.setDisable(false);
+				comboSelection.setVisible(true);
 				ipInput.setVisible(false);
-				COUNT--;
+			}
+		} else if (source == overrideTime) {
+			if (overrideTime.isSelected()) {
+				Main.logger.info("[Override Time] Selection - ON");
+				messageSystem("24 Hour Clock - Enabled", mDelay);
+			} else {
+				Main.logger.info("[Override Time] Selection - OFF");
+				messageSystem("12 Hour Clock - Enabled", mDelay);
 			}
 		}
 	}
 
+	/**
+	 * Method controls all button events in the home screen
+	 * 
+	 * @param event
+	 * @throws UnknownHostException
+	 * @throws IOException
+	 */
 	@FXML
 	private void handleButton(ActionEvent event) throws UnknownHostException, IOException {
 		Button source = (Button) event.getSource();
 		if (source == applyBtn) {
 			Main.logger.info("Apply Button - Clicked");
-			if (!CM.createConfig(timeOn.isSelected(), newsOn.isSelected(), weatherOn.isSelected())) {
-				message.setText("An error occured while creating new config file");
+			if (conBtn.getText().equals("Connect")) {
+				credControl.infoMessage("Connect to SmartMirror",
+						"Please select and connect to a valid SmartMirror for changes to take effect");
 			} else {
-				if (mirrorGateway.uploadConfig()) {
-					message.setText("Display Updated Successfully");
+				save();
+			}
+		} else if (source == resetBtn) {
+			Main.logger.info("Cancel Button - Clicked");
+			initialize();
+		} else if (source == scanBtn) {
+			Main.logger.info("Connect Button - Clicked");
+			scanNetwork();
+		} else if (source == conBtn && conBtn.getText() == "Disconnect") {
+			messageSystem("Disconnected from SmartMirror ", mDelay);
+			conBtn.setText("Connect");
+			comboSelection.setDisable(false);
+			ipInput.setDisable(false);
+			scanBtn.setDisable(false);
+			override.setDisable(false);
+		} else if (source == conBtn) {
+			Main.logger.info("Connect Button - Clicked");
+			piLogin();
+		}
+	}
+
+	/**
+	 * Method scans the local network for potential hosts
+	 */
+	private void scanNetwork() {
+		comboSelection.setValue("Loading...");
+		message.setText("Scanning Network... Please Wait");
+		Runnable expensiveTask = (() -> {
+			try {
+				if (!availPCs.isEmpty())
+					availPCs.clear();
+				availPCs = connManager.scanNetwork();
+			} catch (IOException e) {
+				Main.logger.error("Network Scan failed to execute");
+				e.printStackTrace();
+			}
+
+			if (!comboSelection.getItems().isEmpty())
+				comboSelection.getItems().clear();
+			comboSelection.getItems().addAll(availPCs);
+
+			Platform.runLater(() -> {
+				comboSelection.setDisable(false);
+				scanBtn.setDisable(false);
+				comboSelection.setValue(availPCs.get(0));
+				messageSystem("Network Scan Complete", mDelay);
+			});
+		});
+		comboSelection.setDisable(true);
+		scanBtn.setDisable(true);
+		new Thread(expensiveTask).start();
+	}
+
+	/**
+	 * Method attempts and ensures proper login to RaspPi
+	 */
+	private void piLogin() {
+		if (override.isSelected() && conBtn.getText().equals("Connect")) {
+			if (ipInput.getText() != null) {
+				message.setText("Attempting to connect to: " + ipInput.getText());
+				credControl.login();
+				if (mirrorGateway.testConnection(ipInput.getText().toString())) {
+					credControl.infoMessage("Login Successful", "Magic Mirror connection achieved");
+					conBtn.setText("Disconnect");
+					ipInput.setDisable(true);
+					message.setText("Connected to: " + ipInput.getText());
+					comboSelection.setDisable(true);
+					scanBtn.setDisable(true);
+					override.setDisable(true);
 				} else {
-					credControl.infoMessage("Update Unsuccessful",
-							"An error occured while updating MagicMirror preferences. Please try again.");
+					credControl.infoMessage("Login Unsuccessful",
+							"Username and passwword are incorrect. Please try again.");
+				}
+			} else {
+				credControl.infoMessage("Connect", "Enter a valid IP address.");
+			}
+		}
+
+		if (!override.isSelected() && conBtn.getText().equals("Connect")) {
+			if (comboSelection.getValue() != null) {
+				mirrorGateway.setFtpHost(comboSelection.getValue());
+				message.setText("Attempting to connect to: " + comboSelection.getValue());
+				credControl.login();
+				if (mirrorGateway.testConnection(null)) {
+					credControl.infoMessage("Login Successful", "Magic Mirror connection achieved");
+					conBtn.setText("Disconnect");
+					message.setText("Connected to: " + comboSelection.getValue());
+					comboSelection.setDisable(true);
+					scanBtn.setDisable(true);
+					override.setDisable(true);
+				} else {
+					credControl.infoMessage("Connection Refused",
+							"The username and password used is incorrect. Please try again.");
+					credControl.login();
 				}
 			}
 		}
-		if (source == cancelBtn) {
-			Main.logger.info("Cancel Button - Clicked");
-			initialize();
-		}
-		if (source == connectBtn) {
-			Main.logger.info("Connect Button - Clicked");
-			if (COUNT == 0) {
-				selection.setValue("Loading...");
-				message.setText("Scanning Network... Please Wait");
-				Runnable expensiveTask = (() -> {
-					try {
-						availPCs = connManager.scanNetwork();
-					} catch (IOException e) {
-						Main.logger.error("Network Scan failed to execute");
-						e.printStackTrace();
-					}
+	}
 
-					selection.getItems().addAll(availPCs);
-
-					Platform.runLater(() -> {
-						selection.setDisable(false);
-						selection.setValue(availPCs.get(0));
-						message.setText("Network Scan Complete");
-						connectBtn.setDisable(false);
-					});
-				});
-				new Thread(expensiveTask).start();
-
-				// List<String> TEMPORARY = new ArrayList<String>();
-				// TEMPORARY.add("192.168.0.1");
-				// selection.getItems().addAll(TEMPORARY);
-
-				connectBtn.setDisable(true);
-				connectBtn.setText("Connect");
-				COUNT++;
-			} else if (source == connectBtn && override.isSelected() || COUNT == 1) {
-				if (selection.getValue() != null) {
-					mirrorGateway.setFtpHost(selection.getValue());
-					message.setText("Attempting to connect to: " + selection.getValue());
-					// selection.setDisable(true);
-					// connectBtn.setDisable(true);
-					credControl.login();
-					if (mirrorGateway.testConnection()) {
-						credControl.infoMessage("Login Successful", "Magic Mirror connection achieved");
-						connectBtn.setText("Disconnect");
-						message.setText("Connected to: " + selection.getValue());
-						connectBtn.setDisable(false);
-						override.setDisable(true);
-						COUNT++;
-					} else {
-						credControl.infoMessage("Connection Refused",
-								"The username and password used is incorrect. Please try again.");
-						credControl.login();
-					}
-				}
-			} else if (COUNT == 2) {
-				message.setText("Diconnected from: " + selection.getValue());
-				initialize();
-				connectBtn.setText("Scan");
-				COUNT = 0;
+	/**
+	 * Method pushes new configuration file to RaspPi
+	 */
+	private void save() {
+		if (!CM.createConfig(time.isSelected(), overrideTime.isSelected(), news.isSelected(), weather.isSelected(),
+				calendar.isSelected())) {
+			messageSystem("An error occured. Please try again", mDelay);
+		} else {
+			if (mirrorGateway.uploadConfig()) {
+				messageSystem("Display Updated Successfully", mDelay);
+			} else {
+				credControl.infoMessage("Update Unsuccessful",
+						"An error occured while updating MagicMirror preferences. Please try again.");
 			}
 		}
 	}

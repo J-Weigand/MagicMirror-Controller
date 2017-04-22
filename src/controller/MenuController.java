@@ -20,15 +20,6 @@ public class MenuController {
 		}
 		if (source == menuAbout){
 			Main.logger.info("menuAbout - Clicked");
-			versionInfo();
 		}
 	}
-	
-	private void versionInfo() {
-		String title = "Magic Mirror - Control Software";
-		String msg = "Engineer: Joshua Weigand\n" + "Company: Weigand Tech\n" + "Last Modified: 04/03/2017\n"
-				+ "Version: 2017.04\n";
-		HomeController.credControl.infoMessage(title, msg);
-	}
-
 }

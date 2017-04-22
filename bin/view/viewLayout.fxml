@@ -16,12 +16,6 @@
 							onAction="#handleMenuItem" text="Close" />
 					</items>
 				</Menu>
-				<Menu mnemonicParsing="false" text="Help">
-					<items>
-						<MenuItem fx:id="menuAbout" mnemonicParsing="false"
-							onAction="#handleMenuItem" text="About" />
-					</items>
-				</Menu>
 			</menus>
 		</MenuBar>
 	</top>
